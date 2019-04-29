@@ -1,0 +1,77 @@
+server	{
+   access_log /var/log/nginx/access.log;
+#    access_log off;
+   error_log /var/log/nginx/error.log;
+#    error_log off;
+    error_page 401 /error/401/index.html;
+    error_page 403 /error/403/index.html;
+    error_page 404 /error/404/index.html;
+    error_page 502 /error/502/index.html;error_page 500 /error/500/index.html;
+    
+#location ^~ /error/ {
+#    auth_basic off; 
+#    internal;]
+#	}
+
+#    auth_basic "OpenFLIXR Login";
+#    auth_basic_user_file /etc/nginx/.htpasswd;
+
+location ~ ^/(status|ping)$ {
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_index index.php;
+	}
+
+location ~ /.well-known {
+    allow all;
+	}
+
+listen 80;
+listen 443 ssl http2;	#ssl port config
+server_name PlexServer;  #donotremove_domainname
+
+# SSL + hardening
+#ssl_certificate /etc/letsencrypt/live//fullchain.pem; #donotremove_certificatepath
+#ssl_certificate_key /etc/letsencrypt/live//privkey.pem; #donotremove_certificatekeypath
+ssl_session_timeout 10m;
+ssl_session_cache shared:SSL:10m;
+ssl_buffer_size 64k;
+ssl_session_tickets off;
+ssl_dhparam /etc/nginx/dhparam.pem;
+ssl_protocols TLSv1.2;
+ssl_ecdh_curve secp384r1;
+ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384';
+ssl_prefer_server_ciphers on;
+ssl_stapling on;
+ssl_stapling_verify on;
+#ssl_trusted_certificate /etc/letsencrypt/live//fullchain.pem; #donotremove_trustedcertificatepath
+server_tokens off;
+add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noodp, notranslate, noimageindex";
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+#add_header X-XSS-Protection "1; mode=block";
+#add_header Content-Security-Policy "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; connect-src 'self' https:; img-src 'self' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https:; frame-src 'self' https:; object-src 'none';"; #donotremove_contentsecuritypolicy
+
+  ##
+  # App Location Config
+  ##
+
+  include /etc/nginx/locations-enabled/*.conf;
+
+# add_config_1
+# add_config_2
+# add_config_3
+# add_config_4
+# add_config_5
+# add_config_6
+# add_config_7
+# add_config_8
+# add_config_9
+# add_config_10
+
+	}
+
+
